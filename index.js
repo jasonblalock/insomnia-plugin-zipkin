@@ -48,19 +48,22 @@ async function setHeaders(context) {
 
 function ZipkinApp(props) {
   const queryClient = new QueryClient();
-
+  const { requests } = props;
   return (
     <QueryClientProvider client={queryClient}>
-      <Settings {...props} />
+      {requests.map((request) => (
+        <Settings
+          store={props.store}
+          request={request}
+          initialTraceEnabled={props.initialTraceEnabled}
+          key={request._id}
+        />
+      ))}
+      {/* <Settings {...props} /> */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
-
-const baseSettings = {
-  enabled: false,
-  generateTraceId: false,
-};
 
 function Settings({ store, request, initialTraceEnabled }) {
   const queryClient = useQueryClient();
@@ -70,7 +73,7 @@ function Settings({ store, request, initialTraceEnabled }) {
     traceEnabledId,
     async () => store.hasItem(traceEnabledId),
     {
-      initialData: initialTraceEnabled,
+      initialData: initialTraceEnabled[traceEnabledId],
     },
   );
 
@@ -102,13 +105,18 @@ function Settings({ store, request, initialTraceEnabled }) {
 
   return (
     <div className="pad">
-      <label className="row-spaced">
-        <span className="strong">Enable zipkin tracing</span>
-        <ToggleSwitch
-          checked={traceEnabledQuery.data}
-          onChange={handleTraceToggleChange}
-        />
-      </label>
+      {/* <h4 className="margin-bottom-xs underline">Enable zipkin tracing</h4> */}
+      <div className="pad-left">
+        <label className="row-spaced">
+          <span className="strong">
+            {request.method} {request.name}
+          </span>
+          <ToggleSwitch
+            checked={traceEnabledQuery.data}
+            onChange={handleTraceToggleChange}
+          />
+        </label>
+      </div>
     </div>
   );
 }
@@ -116,22 +124,23 @@ function Settings({ store, request, initialTraceEnabled }) {
 const zipkinRequestAction = {
   label: 'Zipkin',
   action: async (context, data) => {
-    const initialTraceEnabled = await context.store.hasItem(
-      `${TRACE_ENABLED_KEY_PREFIX}.${data.request._id}`,
-    );
+    const traceEnabledId = `${TRACE_ENABLED_KEY_PREFIX}.${data.request._id}`;
+    const initialTraceEnabled = await context.store.hasItem(traceEnabledId);
 
     const root = document.createElement('div');
     ReactDOM.render(
       <ZipkinApp
         store={context.store}
-        request={data.request}
-        initialTraceEnabled={initialTraceEnabled}
+        requests={[data.request]}
+        initialTraceEnabled={{
+          [traceEnabledId]: initialTraceEnabled,
+        }}
       />,
       root,
     );
 
     context.app.dialog(
-      `Zipkin - ${data.request.method} ${data.request.name}!`,
+      `Zipkin - ${data.request.method} ${data.request.name}`,
       root,
       {
         skinny: true,
@@ -141,5 +150,34 @@ const zipkinRequestAction = {
   },
 };
 
+const zipkinGroupAction = {
+  label: 'Zipkin',
+  action: async (context, data) => {
+    const { requests } = data;
+    const initialTraceEnabled = {};
+    for (const request of requests) {
+      const traceEnabledId = `${TRACE_ENABLED_KEY_PREFIX}.${request._id}`;
+      const traceEnabled = await context.store.hasItem(traceEnabledId);
+      initialTraceEnabled[traceEnabledId] = traceEnabled;
+    }
+
+    const root = document.createElement('div');
+    ReactDOM.render(
+      <ZipkinApp
+        store={context.store}
+        requests={requests}
+        initialTraceEnabled={initialTraceEnabled}
+      />,
+      root,
+    );
+
+    context.app.dialog(`Zipkin`, root, {
+      skinny: true,
+      onHide: () => ReactDOM.unmountComponentAtNode(root),
+    });
+  },
+};
+
 exports.requestActions = [zipkinRequestAction];
 exports.requestHooks = [setHeaders];
+exports.requestGroupActions = [zipkinGroupAction];
