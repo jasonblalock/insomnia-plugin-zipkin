@@ -1,0 +1,43 @@
+{
+  "name": "insomnia-plugin-zipkin",
+  "version": "0.0.1",
+  "private": true,
+  "watch": {
+    "copy": {
+      "patterns": [
+        "*"
+      ],
+      "build": {
+        "ignore": "node_modules"
+      }
+    }
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js --display errors-only",
+    "watch": "webpack --config webpack.config.js --watch",
+    "copy": "mkdir -p \"/Users/jblalock/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin\" && rsync -av --delete * \"/Users/jblalock/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin/\" --exclude node_modules",
+    "watch-copy": "npm-watch"
+  },
+  "insomnia": {
+    "name": "zipkin",
+    "displayName": "Zipkin Plugin",
+    "description": "Plugin for enabling zipkin headers on requests"
+  },
+  "main": "dist/index.js",
+  "dependencies": {
+    "insomnia-components": "^2.3.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-query": "^3.19.6",
+    "styled-components": "^5.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "npm-watch": "^0.11.0",
+    "webpack": "^5.50.0",
+    "webpack-cli": "^4.7.2"
+  }
+}
