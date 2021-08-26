@@ -2,21 +2,13 @@
   "name": "insomnia-plugin-zipkin",
   "version": "0.0.1",
   "private": true,
-  "watch": {
-    "copy": {
-      "patterns": [
-        "*"
-      ],
-      "build": {
-        "ignore": "node_modules"
-      }
-    }
-  },
   "scripts": {
     "build": "webpack --config webpack.config.js --display errors-only",
-    "watch": "webpack --config webpack.config.js --watch",
-    "copy": "mkdir -p \"/Users/jblalock/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin\" && rsync -av --delete * \"/Users/jblalock/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin/\" --exclude node_modules",
-    "watch-copy": "npm-watch"
+    "watch": "run-p watch-dev onchange-sync",
+    "watch-dev": "webpack --config webpack.config.js --watch",
+    "sync": "mkdir -p \"$HOME/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin\" && rsync -av --delete --delete-excluded --exclude node_modules --exclude \".git\" $PWD/ \"$HOME/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin/\"",
+    "onchange-sync": "chokidar --initial --ignore .git --ignore node_modules --silent '*' '**/*' -c 'yarn sync'",
+    "test": "jest"
   },
   "insomnia": {
     "name": "zipkin",
@@ -25,18 +17,24 @@
   },
   "main": "dist/index.js",
   "dependencies": {
+    "framer-motion": "^4.1.17",
     "insomnia-components": "^2.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.19.6",
+    "react-use": "^17.2.4",
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-react": "^7.14.5",
+    "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
-    "npm-watch": "^0.11.0",
+    "chokidar-cli": "^3.0.0",
+    "jest": "^27.0.6",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
     "webpack": "^5.50.0",
     "webpack-cli": "^4.7.2"
   }
