@@ -1,9 +1,8 @@
 {
   "name": "insomnia-plugin-zipkin",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
-    "build": "webpack --config webpack.config.js --display errors-only",
+    "build": "webpack --config webpack.config.js --stats errors-only",
     "watch": "run-p watch-dev onchange-sync",
     "watch-dev": "webpack --config webpack.config.js --watch",
     "sync": "mkdir -p \"$HOME/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin\" && rsync -av --delete --delete-excluded --exclude node_modules --exclude \".git\" $PWD/ \"$HOME/Library/Application Support/Insomnia/plugins/insomnia-plugin-zipkin/\"",
