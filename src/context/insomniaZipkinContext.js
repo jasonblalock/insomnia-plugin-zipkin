@@ -2,9 +2,17 @@ import React from 'react';
 
 const InsomniaZipkinContext = React.createContext();
 
-function InsomniaZipkinProvider({ store, requests, initialData, children }) {
+function InsomniaZipkinProvider({
+  store,
+  requests,
+  initialData,
+  syncStore,
+  children,
+}) {
   return (
-    <InsomniaZipkinContext.Provider value={{ store, requests, initialData }}>
+    <InsomniaZipkinContext.Provider
+      value={{ store, requests, initialData, syncStore }}
+    >
       {children}
     </InsomniaZipkinContext.Provider>
   );

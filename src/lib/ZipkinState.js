@@ -1,10 +1,13 @@
-class ZipkinRequest {
+import DOMPurify from 'dompurify';
+
+class ZipkinState {
   #store;
   #initialData = {
     version: '0.1',
     isEnabled: false,
     generateTraceId: false,
     lastTraceId: null,
+    traceIdHeaderKey: 'X-B3-TraceId',
   };
 
   constructor(store, requestId) {
@@ -56,6 +59,23 @@ class ZipkinRequest {
     await this.#update(data);
   }
 
+  async setTraceIdHeaderKey(key) {
+    const data = await this.#findOrCreate();
+    if (key == null || key.trim().length === 0) {
+      data.traceIdHeaderKey = 'X-B3-TraceId';
+    } else {
+      const cleanKey = DOMPurify.sanitize(key.trim());
+      data.traceIdHeaderKey = cleanKey;
+    }
+
+    await this.#update(data);
+  }
+
+  async getTraceIdHeaderKey() {
+    const data = await this.#findOrCreate();
+    return data.traceIdHeaderKey;
+  }
+
   // private
 
   async #findOrCreate() {
@@ -77,4 +97,4 @@ class ZipkinRequest {
   }
 }
 
-export { ZipkinRequest };
+export { ZipkinState };

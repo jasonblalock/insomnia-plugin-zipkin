@@ -1,16 +1,20 @@
 import React from 'react';
 import { useInsomniaZipkin } from '../context/insomniaZipkinContext';
-import { SettingRequestGroup } from './SettingRequestGroup';
+import { RequestSettings } from './RequestSettings';
 import { ListGroup } from 'insomnia-components';
+import { RequestData } from './RequestData';
 
-export function Settings() {
+export function Requests() {
   const { requests } = useInsomniaZipkin();
 
   return (
     <div className="pad">
       <ListGroup>
         {requests.map((request) => (
-          <SettingRequestGroup key={request._id} request={request} />
+          <React.Fragment key={request._id}>
+            <RequestData request={request} />
+            <RequestSettings request={request} />
+          </React.Fragment>
         ))}
       </ListGroup>
     </div>

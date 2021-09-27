@@ -11,12 +11,6 @@ module.exports = {
     library: 'zipkin',
     libraryTarget: 'commonjs2',
   },
-  // output: {
-  //   path: path.resolve(__dirname),
-  //   filename: 'main.js',
-  //   library: 'zipkin',
-  //   libraryTarget: 'commonjs2',
-  // },
   module: {
     rules: [
       {
